@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "saifali3366/employee-management-backend"
+        IMAGE_TAG = "${BUILD_NUMBER}"
     }
 
     stages {
@@ -16,7 +17,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t %IMAGE_NAME%:latest .'
+                bat 'docker build -t %IMAGE_NAME%:%IMAGE_TAG% .'
             }
         }
 
@@ -27,16 +28,14 @@ pipeline {
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-                    bat '''
-                    docker login -u %DOCKER_USER% -p %DOCKER_PASS%
-                    '''
+                    bat 'docker login -u %DOCKER_USER% -p %DOCKER_PASS%'
                 }
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                bat 'docker push %IMAGE_NAME%:latest'
+                bat 'docker push %IMAGE_NAME%:%IMAGE_TAG%'
             }
         }
 
@@ -55,7 +54,7 @@ pipeline {
 
     post {
         success {
-            echo 'Backend CI/CD completed successfully.'
+            echo "Docker image pushed successfully: ${IMAGE_NAME}:${IMAGE_TAG}"
         }
 
         failure {
