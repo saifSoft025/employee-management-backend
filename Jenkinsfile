@@ -16,33 +16,46 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME:latest .'
+                bat 'docker build -t %IMAGE_NAME%:latest .'
             }
         }
 
-        stage('Docker Hub Login & Push') {
+        stage('Docker Hub Login') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub',
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-                    sh '''
-                    echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                    docker push $IMAGE_NAME:latest
-                    '''
+                    bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
                 }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                bat 'docker push %IMAGE_NAME%:latest'
+            }
+        }
+
+        stage('Docker Logout') {
+            steps {
+                bat 'docker logout'
             }
         }
     }
 
     post {
         success {
-            echo '✅ Docker Image Successfully Pushed!'
+            echo 'Docker image successfully built and pushed to Docker Hub.'
         }
 
         failure {
-            echo '❌ Pipeline Failed!'
+            echo 'Pipeline failed.'
+        }
+
+        always {
+            cleanWs()
         }
     }
 }
