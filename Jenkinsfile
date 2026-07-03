@@ -33,9 +33,13 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image') {
+            stage('Trigger Helm Deployment') {
             steps {
-                bat 'docker push %IMAGE_NAME%:%IMAGE_TAG%'
+                build job: 'employee-management-helm',
+                parameters: [
+                    string(name: 'IMAGE_TAG', value: "${IMAGE_TAG}")
+                ],
+                wait: true
             }
         }
 
