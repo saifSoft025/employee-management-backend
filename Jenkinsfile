@@ -40,6 +40,12 @@ pipeline {
             }
         }
 
+        stage('Trigger Helm Deployment') {
+            steps {
+                build job: 'employee-management-helm', wait: true
+            }
+        }
+
         stage('Docker Logout') {
             steps {
                 bat 'docker logout'
@@ -49,7 +55,7 @@ pipeline {
 
     post {
         success {
-            echo 'Docker image successfully built and pushed to Docker Hub.'
+            echo 'Backend CI/CD completed successfully.'
         }
 
         failure {
