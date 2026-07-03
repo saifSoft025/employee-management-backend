@@ -43,11 +43,7 @@ pipeline {
             }
         }
 
-        stage('Trigger Helm Deployment') {
-            steps {
-                build job: 'employee-management-helm', wait: true
-            }
-        }
+      
 
         stage('Docker Logout') {
             steps {
