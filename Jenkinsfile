@@ -33,17 +33,22 @@ pipeline {
             }
         }
 
-            stage('Trigger Helm Deployment') {
+        stage('Push Docker Image') {
             steps {
-                build job: 'employee-management-helm',
-                parameters: [
-                    string(name: 'IMAGE_TAG', value: "${IMAGE_TAG}")
-                ],
-                wait: true
+                bat 'docker push %IMAGE_NAME%:%IMAGE_TAG%'
             }
         }
 
-      
+        stage('Trigger Helm Deployment') {
+            steps {
+                build job: 'employee-management-helm',
+                    parameters: [
+                        string(name: 'BACKEND_IMAGE_TAG', value: "${IMAGE_TAG}"),
+                        string(name: 'FRONTEND_IMAGE_TAG', value: "latest")
+                    ],
+                    wait: true
+            }
+        }
 
         stage('Docker Logout') {
             steps {
@@ -54,11 +59,11 @@ pipeline {
 
     post {
         success {
-            echo "Docker image pushed successfully: ${IMAGE_NAME}:${IMAGE_TAG}"
+            echo "Backend image pushed successfully: ${IMAGE_NAME}:${IMAGE_TAG}"
         }
 
         failure {
-            echo 'Pipeline failed.'
+            echo 'Backend pipeline failed.'
         }
 
         always {
