@@ -6,7 +6,7 @@ const sequelize = require("./config/db");
 dotenv.config();
 
 const app = express();
-
+app.options("*", cors());
 app.use(cors({
   origin: [
     "https://main.d1078qw6x3k74s.amplifyapp.com"
