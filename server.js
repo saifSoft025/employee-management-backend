@@ -6,31 +6,20 @@ const sequelize = require("./config/db");
 dotenv.config();
 
 const app = express();
-app.options("*", cors());
-app.use(cors({
-  origin: [
-    "https://main.d1078qw6x3k74s.amplifyapp.com"
-  ],
-  methods: [
-    "GET",
-    "POST",
-    "PUT",
-    "PATCH",
-    "DELETE",
-    "OPTIONS"
-  ],
-  allowedHeaders: [
-    "Content-Type",
-    "Authorization"
-  ],
-  credentials: true
-}));
 
-// Handle preflight requests
-app.options("*", cors());
+// CORS Configuration
+app.use(
+  cors({
+    origin: "https://main.d1078qw6x3k74s.amplifyapp.com",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
+// Routes
 app.use("/api/employees", require("./routes/employeeRoutes"));
 
 const PORT = process.env.PORT || 5000;
