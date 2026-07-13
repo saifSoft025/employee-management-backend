@@ -5,6 +5,16 @@ const dotenv = require("dotenv");
 // Load environment variables first
 dotenv.config();
 
+process.on("uncaughtException", (err) => {
+  console.error("UNCAUGHT EXCEPTION:");
+  console.error(err);
+});
+
+process.on("unhandledRejection", (err) => {
+  console.error("UNHANDLED REJECTION:");
+  console.error(err);
+});
+
 // Import database after dotenv
 const sequelize = require("./config/db");
 
@@ -76,4 +86,7 @@ async function startServer() {
   }
 }
 
-startServer();
+startServer().catch((err) => {
+  console.error("START SERVER ERROR:");
+  console.error(err);
+});
