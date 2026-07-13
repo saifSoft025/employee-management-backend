@@ -1,18 +1,38 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const sequelize = require("./config/db");
 
+// Load environment variables first
 dotenv.config();
+
+// Import database after dotenv
+const sequelize = require("./config/db");
 
 const app = express();
 
 // CORS Configuration
+// Use ALLOWED_ORIGINS (comma-separated) to whitelist origins. If not set, allow all origins.
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || "").split(",").map((s) => s.trim()).filter(Boolean);
+
 app.use(
   cors({
-    origin: "https://main.d1078qw6x3k74s.amplifyapp.com",
+    origin: function (origin, callback) {
+      // Allow non-browser requests like curl or server-to-server (no origin)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.length === 0) {
+        // No whitelist configured — allow all origins
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("CORS policy: This origin is not allowed."));
+    },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept", "Origin"],
     credentials: true,
   })
 );

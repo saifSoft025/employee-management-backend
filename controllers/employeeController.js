@@ -29,14 +29,34 @@ const getEmployee = async (req, res) => {
   }
 };
 
+const parseSalary = (salary) => {
+  if (salary === undefined || salary === null) {
+    return null;
+  }
+
+  const normalized = salary.toString().replace(/,/g, "").trim();
+  if (normalized === "") {
+    return null;
+  }
+
+  const parsed = Number(normalized);
+  return Number.isInteger(parsed) ? parsed : null;
+};
+
 // CREATE
 const createEmployee = async (req, res) => {
   try {
+    const salary = parseSalary(req.body.salary);
+
+    if (salary === null) {
+      return res.status(400).json({ message: "Salary must be a valid integer." });
+    }
+
     const employee = await Employee.create({
       name: req.body.name,
       email: req.body.email,
       designation: req.body.designation,
-      salary: req.body.salary,
+      salary,
     });
 
     res.status(201).json(employee);
@@ -56,11 +76,17 @@ const updateEmployee = async (req, res) => {
       });
     }
 
+    const salary = parseSalary(req.body.salary);
+
+    if (salary === null) {
+      return res.status(400).json({ message: "Salary must be a valid integer." });
+    }
+
     await employee.update({
       name: req.body.name,
       email: req.body.email,
       designation: req.body.designation,
-      salary: req.body.salary,
+      salary,
     });
 
     res.status(200).json(employee);
