@@ -9,7 +9,7 @@ const {
 } = require("../controllers/employeeController");
 
 const router = express.Router();
-
+// router
 router.get("/", getEmployees);
 router.get("/:id", getEmployee);
 router.post("/", createEmployee);
